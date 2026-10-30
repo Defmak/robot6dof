@@ -74,6 +74,14 @@ main { display: flex; flex: 1; min-height: 0; }
 
 .joint-row { margin-bottom: 12px; }
 
+.grip-row {
+  border-top: 1px dashed #39435a;
+  border-bottom: 1px dashed #39435a;
+  padding: 8px 0;
+  margin: 14px 0;
+}
+.grip-row input[type="range"] { accent-color: #00e5ff; }
+
 .joint-head {
   display: flex;
   justify-content: space-between;

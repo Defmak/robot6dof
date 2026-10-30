@@ -18,7 +18,7 @@ Ouvrir ensuite http://localhost:8080 dans un navigateur.
 - **Vue 3D manipulable** : orbite (glisser), zoom (molette), panoramique (clic droit) via OrbitControls.
 - **6 curseurs** : un par degré de liberté, avec limites d'angle réalistes et valeur affichée en degrés.
 - **Mode démo** : animation cyclique du robot entre plusieurs poses (bouton « ▶ Mode démo »), avec tracé de la trajectoire du TCP (outil). En mode démo, la pince saisit/lâche automatiquement les objets proches.
-- **Pince ouvrable** : bouton « 🤏 Fermer la pince / ✋ Ouvrir la pince » ; la pince attrape la poignée d'un objet proche du TCP quand elle se ferme et le transporte, puis le lâche à l'ouverture.
+- **Pince ouvrable** : bouton « 🤏 Fermer la pince / ✋ Ouvrir la pince » **et curseur « ✋ Main · ouverture de la pince » (0–100 %)** placé entre le coude (J3) et les poignets ; la pince attrape la poignée d'un objet proche du TCP quand elle se ferme et le transporte, puis le lâche à l'ouverture.
 - **6 objets à poignée** posés au sol autour du robot ; la poignée ciblée est surlignée en cyan.
 - **Enregistrement de macros** : bouton « ⏺ Start / ⏹ Stop » mémorise tous les mouvements des curseurs (60 échantillons/s) ; à l'arrêt, la macro est « en attente » et un clic sur un bouton **M1–M6** la sauvegarde dans ce slot (✔). Un clic sur un bouton M1–M6 avec une macro enregistrée la **rejoue** intégralement.
 - **Protection sol** : case « 🛡️ Empêcher la main de passer sous le sol » (activée par défaut) — toute pose qui ferait descendre le TCP sous 5 cm du sol est refusée et la pose précédente est restaurée.

@@ -107,6 +107,7 @@ const state = {
   demo: false,
   demoStart: 0,
   gripOpen: true,
+  gripTarget: 1,
   gripAmount: 1,
   recorder: createRecorder(),
   pendingMacro: null,
@@ -167,6 +168,7 @@ recBtn.addEventListener('click', () => {
 
 function setGripOpen(open) {
   state.gripOpen = open;
+  state.gripTarget = open ? 1 : 0;
   gripBtn.textContent = open ? '🤏 Fermer la pince' : '✋ Ouvrir la pince';
   gripBtn.classList.toggle('active', !open);
 }
@@ -206,12 +208,36 @@ JOINTS.forEach((j, i) => {
   });
 });
 
+const gripRow = document.createElement('div');
+gripRow.className = 'joint-row grip-row';
+gripRow.innerHTML = `
+  <div class="joint-head">
+    <span class="joint-name">✋ Main · ouverture de la pince</span>
+    <span class="joint-val" id="val-grip">100 %</span>
+  </div>
+  <input type="range" id="slider-grip" min="0" max="100" step="1" value="100"
+    aria-label="Ouverture de la pince">
+`;
+slidersEl.insertBefore(gripRow, slidersEl.children[3]);
+const gripSlider = gripRow.querySelector('#slider-grip');
+gripSlider.addEventListener('input', () => {
+  stopDemo();
+  const v = parseFloat(gripSlider.value);
+  state.gripOpen = v > 0;
+  state.gripTarget = v / 100;
+  gripBtn.textContent = state.gripOpen ? '🤏 Fermer la pince' : '✋ Ouvrir la pince';
+  gripBtn.classList.toggle('active', !state.gripOpen);
+  gripRow.querySelector('#val-grip').textContent = `${v} %`;
+});
+
 function syncSliders() {
   JOINTS.forEach((j, i) => {
     const slider = document.getElementById(`slider-${j.id}`);
     slider.value = state.angles[i];
     document.getElementById(`val-${j.id}`).textContent = `${state.angles[i].toFixed(1)}°`;
   });
+  gripSlider.value = Math.round(state.gripTarget * 100);
+  gripRow.querySelector('#val-grip').textContent = `${gripSlider.value} %`;
 }
 
 function stopDemo() {
@@ -288,7 +314,7 @@ function animate() {
   tcpEl.textContent = `TCP : x ${tcp.x.toFixed(2)} · y ${tcp.y.toFixed(2)} · z ${tcp.z.toFixed(2)} m`;
 
   if (state.demo) setGripOpen(findGrabbable(tcp, targets) === null);
-  state.gripAmount += ((state.gripOpen ? 1 : 0) - state.gripAmount) * 0.2;
+  state.gripAmount += (state.gripTarget - state.gripAmount) * 0.2;
   setGripper(robot, state.gripAmount);
 
   const held = targets.find((t) => t.held);
