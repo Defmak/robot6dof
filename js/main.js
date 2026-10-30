@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { JOINTS, clampAll, demoPoseAt, demoCycleDuration } from './kinematics.js';
-import { buildRobot, applyAngles, tcpWorldPosition, setGripper } from './robot3d.js';
+import { buildRobot, applyAngles, tcpWorldPosition, setGripper, tryAngles } from './robot3d.js';
 import { buildTargets, findGrabbable, setHighlight, releaseTarget, stepFall } from './objects.js';
 
 const canvasContainer = document.getElementById('scene');
@@ -9,6 +9,7 @@ const slidersEl = document.getElementById('sliders');
 const demoBtn = document.getElementById('demo-btn');
 const resetBtn = document.getElementById('reset-btn');
 const gripBtn = document.getElementById('grip-btn');
+const groundLock = document.getElementById('ground-lock');
 const tcpEl = document.getElementById('tcp-readout');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -124,7 +125,15 @@ JOINTS.forEach((j, i) => {
   const slider = row.querySelector(`#slider-${j.id}`);
   slider.addEventListener('input', () => {
     stopDemo();
-    state.angles[i] = parseFloat(slider.value);
+    const next = [...state.angles];
+    next[i] = parseFloat(slider.value);
+    if (groundLock.checked) {
+      if (!tryAngles(robot, next)) {
+        slider.value = state.angles[i];
+        return;
+      }
+    }
+    state.angles = next;
     row.querySelector(`#val-${j.id}`).textContent = `${state.angles[i].toFixed(1)}°`;
   });
 });
@@ -181,7 +190,11 @@ function animate() {
     state.angles = clampAll(demoPoseAt(t - state.demoStart));
     syncSliders();
   }
-  applyAngles(robot.joints, state.angles);
+  if (groundLock.checked) {
+    tryAngles(robot, state.angles);
+  } else {
+    applyAngles(robot.joints, state.angles);
+  }
 
   const tcp = tcpWorldPosition(robot);
   tcpMarker.position.copy(tcp);

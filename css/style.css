@@ -77,6 +77,17 @@ input[type="range"] {
   cursor: pointer;
 }
 
+#ground-lock-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #c6d2e4;
+  cursor: pointer;
+  user-select: none;
+}
+#ground-lock-row input { accent-color: #00e5ff; width: 15px; height: 15px; cursor: pointer; }
+
 .tcp {
   margin-top: 6px;
   padding: 8px 10px;

@@ -104,6 +104,26 @@ export function tcpWorldPosition(robot) {
   return robot.tcp.getWorldPosition(new THREE.Vector3());
 }
 
+export const GROUND_MIN_Y = 0.05;
+
+export function tryAngles(robot, anglesDeg, minY = GROUND_MIN_Y) {
+  const prev = robot.joints.map((j) => ({
+    x: j.rotation.x,
+    y: j.rotation.y,
+    z: j.rotation.z,
+  }));
+  applyAngles(robot.joints, anglesDeg);
+  if (tcpWorldPosition(robot).y < minY) {
+    robot.joints.forEach((j, i) => {
+      j.rotation.x = prev[i].x;
+      j.rotation.y = prev[i].y;
+      j.rotation.z = prev[i].z;
+    });
+    return false;
+  }
+  return true;
+}
+
 export const GRIPPER_REST_X = 0.055;
 export const GRIPPER_MAX_OPEN_X = 0.07;
 
