@@ -28,6 +28,7 @@ function jointSphere(r, material = matSteel) {
 
 export function buildRobot() {
   const robot = new THREE.Group();
+  robot.rotation.x = -Math.PI / 2;
 
   const socle = mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.18, 40), matDark, 0, 0, 0.09);
   const couronne = mesh(new THREE.CylinderGeometry(0.24, 0.3, 0.24, 40), matSteel, 0, 0, 0.28);
