@@ -53,5 +53,5 @@ test('stepFall ne touche pas un objet tenu ou au sol', () => {
   u.group.position.y = 0;
   stepFall(u, 0.016);
   assert.equal(u.group.position.y, 0, 'objet au sol inchangé');
-  assert.equal(u.falling, false);
+  assert.ok(!u.falling, 'pas de chute');
 });
