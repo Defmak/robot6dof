@@ -77,17 +77,16 @@ test('la base est un cône solidaire de J1 et posée sur le sol', () => {
   const r = buildRobot();
   const cone = r.joints[0].children.find((c) => c.isMesh && c.geometry.type === 'CylinderGeometry');
   assert.ok(cone, 'cône présent dans le groupe J1');
-  assert.ok(Math.abs(cone.geometry.parameters.radiusTop - 0.24) < 1e-9);
-  assert.ok(Math.abs(cone.geometry.parameters.radiusBottom - 0.52) < 1e-9);
+  assert.ok(Math.abs(cone.geometry.parameters.radiusTop - 0.24) < 1e-9, 'petit rayon au sommet');
+  assert.ok(Math.abs(cone.geometry.parameters.radiusBottom - 0.52) < 1e-9, 'grand rayon à la base');
   assert.ok(cone.geometry.parameters.radiusBottom > cone.geometry.parameters.radiusTop, 'base évasée vers le sol');
+  assert.ok(Math.abs(cone.rotation.x - Math.PI / 2) < 1e-9, 'axe du cône vertical (local Z)');
   r.group.updateMatrixWorld(true);
-  const p = new THREE.Vector3();
-  cone.getWorldPosition(p);
-  assert.ok(Math.abs(p.y - 0.18) < 1e-9, `centre du cône à y=${p.y}`);
-  const bottomY = p.y - cone.geometry.parameters.height / 2;
-  assert.ok(Math.abs(bottomY) < 1e-9, `base du cône au sol (y=${bottomY})`);
-  const topY = p.y + cone.geometry.parameters.height / 2;
-  assert.ok(Math.abs(topY - 0.36) < 1e-9, `sommet du cône au niveau de J1 (y=${topY})`);
+  const h = cone.geometry.parameters.height / 2;
+  const topWorld = cone.localToWorld(new THREE.Vector3(0, h, 0));
+  const botWorld = cone.localToWorld(new THREE.Vector3(0, -h, 0));
+  assert.ok(Math.abs(botWorld.y) < 1e-9, `grand rayon au sol (y=${botWorld.y})`);
+  assert.ok(Math.abs(topWorld.y - 0.36) < 1e-9, `petit rayon au niveau de la sphère J1 (y=${topWorld.y})`);
 
   applyAngles(r.joints, [90, 0, 0, 0, 0, 0]);
   assert.ok(Math.abs(r.joints[0].rotation.z - Math.PI / 2) < 1e-9, 'le cône tourne avec J1');

@@ -34,6 +34,7 @@ export function buildRobot() {
   j1.position.z = 0.36;
   robot.add(j1);
   const baseCone = mesh(new THREE.CylinderGeometry(0.24, 0.52, 0.36, 40), matDark, 0, 0, -0.18);
+  baseCone.rotation.x = Math.PI / 2;
   j1.add(baseCone);
   j1.add(jointSphere(0.21));
   const link1 = zCylinder(0.15, L[0], matBody);
