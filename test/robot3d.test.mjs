@@ -73,6 +73,26 @@ test('la position du TCP reste dans l’enveloppe atteignable', () => {
   }
 });
 
+test('la base est un cône solidaire de J1 et posée sur le sol', () => {
+  const r = buildRobot();
+  const cone = r.joints[0].children.find((c) => c.isMesh && c.geometry.type === 'CylinderGeometry');
+  assert.ok(cone, 'cône présent dans le groupe J1');
+  assert.ok(Math.abs(cone.geometry.parameters.radiusTop - 0.24) < 1e-9);
+  assert.ok(Math.abs(cone.geometry.parameters.radiusBottom - 0.52) < 1e-9);
+  assert.ok(cone.geometry.parameters.radiusBottom > cone.geometry.parameters.radiusTop, 'base évasée vers le sol');
+  r.group.updateMatrixWorld(true);
+  const p = new THREE.Vector3();
+  cone.getWorldPosition(p);
+  assert.ok(Math.abs(p.y - 0.18) < 1e-9, `centre du cône à y=${p.y}`);
+  const bottomY = p.y - cone.geometry.parameters.height / 2;
+  assert.ok(Math.abs(bottomY) < 1e-9, `base du cône au sol (y=${bottomY})`);
+  const topY = p.y + cone.geometry.parameters.height / 2;
+  assert.ok(Math.abs(topY - 0.36) < 1e-9, `sommet du cône au niveau de J1 (y=${topY})`);
+
+  applyAngles(r.joints, [90, 0, 0, 0, 0, 0]);
+  assert.ok(Math.abs(r.joints[0].rotation.z - Math.PI / 2) < 1e-9, 'le cône tourne avec J1');
+});
+
 test('les maillons sont des meshes 3D', () => {
   const r = buildRobot();
   let meshes = 0;
