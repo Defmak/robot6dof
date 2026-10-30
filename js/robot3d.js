@@ -90,7 +90,7 @@ export function buildRobot() {
   j6.add(tcp);
 
   const joints = [j1, j2, j3, j4, j5, j6];
-  return { group: robot, joints, tcp };
+  return { group: robot, joints, tcp, gripper: { left: doigtG, right: doigtD } };
 }
 
 export function applyAngles(joints, anglesDeg) {
@@ -102,6 +102,16 @@ export function applyAngles(joints, anglesDeg) {
 export function tcpWorldPosition(robot) {
   robot.group.updateMatrixWorld(true);
   return robot.tcp.getWorldPosition(new THREE.Vector3());
+}
+
+export const GRIPPER_REST_X = 0.055;
+export const GRIPPER_MAX_OPEN_X = 0.07;
+
+export function setGripper(robot, open01) {
+  const o = Math.min(1, Math.max(0, open01));
+  const x = GRIPPER_REST_X + o * GRIPPER_MAX_OPEN_X;
+  robot.gripper.left.position.x = x;
+  robot.gripper.right.position.x = -x;
 }
 
 export { TOOL_LENGTH };

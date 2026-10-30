@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { JOINTS, clampAll, demoPoseAt, demoCycleDuration } from './kinematics.js';
-import { buildRobot, applyAngles, tcpWorldPosition } from './robot3d.js';
+import { buildRobot, applyAngles, tcpWorldPosition, setGripper } from './robot3d.js';
+import { buildTargets, findGrabbable, handleWorldPosition, setHighlight } from './objects.js';
 
 const canvasContainer = document.getElementById('scene');
 const slidersEl = document.getElementById('sliders');
 const demoBtn = document.getElementById('demo-btn');
 const resetBtn = document.getElementById('reset-btn');
+const gripBtn = document.getElementById('grip-btn');
 const tcpEl = document.getElementById('tcp-readout');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -63,6 +65,9 @@ robot.group.traverse((o) => {
   if (o.isMesh) o.castShadow = true;
 });
 scene.add(robot.group);
+setGripper(robot, 1);
+
+const targets = buildTargets(scene);
 
 const tcpMarker = new THREE.Mesh(
   new THREE.SphereGeometry(0.035, 16, 12),
@@ -89,7 +94,20 @@ const state = {
   angles: JOINTS.map((j) => j.home),
   demo: false,
   demoStart: 0,
+  gripOpen: true,
+  gripAmount: 1,
 };
+
+function setGripOpen(open) {
+  state.gripOpen = open;
+  gripBtn.textContent = open ? '🤏 Fermer la pince' : '✋ Ouvrir la pince';
+  gripBtn.classList.toggle('active', !open);
+}
+
+gripBtn.addEventListener('click', () => {
+  stopDemo();
+  setGripOpen(!state.gripOpen);
+});
 
 JOINTS.forEach((j, i) => {
   const row = document.createElement('div');
@@ -166,6 +184,21 @@ function animate() {
   tcpRing.position.copy(tcp);
   tcpRing.lookAt(camera.position);
   tcpEl.textContent = `TCP : x ${tcp.x.toFixed(2)} · y ${tcp.y.toFixed(2)} · z ${tcp.z.toFixed(2)} m`;
+
+  if (state.demo) setGripOpen(findGrabbable(tcp, targets) === null);
+  state.gripAmount += ((state.gripOpen ? 1 : 0) - state.gripAmount) * 0.2;
+  setGripper(robot, state.gripAmount);
+
+  const held = targets.find((t) => t.held);
+  if (state.gripAmount < 0.5 && !held) {
+    const g = findGrabbable(tcp, targets);
+    if (g) g.held = true;
+  }
+  if (state.gripAmount > 0.5 && held) held.held = false;
+  if (held) {
+    held.group.position.copy(tcp).sub(held.handle.position);
+  }
+  setHighlight(targets, state.gripAmount < 0.5 ? null : findGrabbable(tcp, targets));
 
   if (state.demo) {
     trail.push(tcp.clone());
