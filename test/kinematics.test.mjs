@@ -11,8 +11,8 @@ import {
   DEMO_MOVE_TIME,
 } from '../js/kinematics.js';
 
-test('6 degrés de liberté définis avec limites cohérentes', () => {
-  assert.equal(JOINTS.length, 6);
+test('7 degrés de liberté définis avec limites cohérentes', () => {
+  assert.equal(JOINTS.length, 7);
   for (const j of JOINTS) {
     assert.ok(j.min < j.max, `${j.id}: min < max`);
     assert.ok(j.home >= j.min && j.home <= j.max, `${j.id}: home dans les limites`);
@@ -20,7 +20,7 @@ test('6 degrés de liberté définis avec limites cohérentes', () => {
   }
 });
 
-test('5 longueurs de maillons pour 6 articulations', () => {
+test('6 longueurs de maillons pour 7 articulations', () => {
   assert.equal(LINK_LENGTHS.length, JOINTS.length - 1);
   for (const l of LINK_LENGTHS) assert.ok(l > 0);
 });
@@ -33,12 +33,12 @@ test('clampDeg respecte les butées', () => {
 });
 
 test('clampAll borne chaque angle et complète les valeurs manquantes', () => {
-  const clamped = clampAll([9999, -9999, 10, undefined, 0, 5000]);
+  const clamped = clampAll([9999, -9999, 10, undefined, 0, 0, 5000]);
   assert.equal(clamped[0], JOINTS[0].max);
   assert.equal(clamped[1], JOINTS[1].min);
   assert.equal(clamped[2], 10);
   assert.equal(clamped[3], JOINTS[3].home);
-  assert.equal(clamped[5], JOINTS[5].max);
+  assert.equal(clamped[6], JOINTS[6].max);
 });
 
 test('la démo est périodique et bornée', () => {

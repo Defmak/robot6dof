@@ -4,16 +4,16 @@ import * as THREE from 'three';
 import { JOINTS, LINK_LENGTHS } from '../js/kinematics.js';
 import { buildRobot, applyAngles, tcpWorldPosition } from '../js/robot3d.js';
 
-test('le robot a 6 groupes d’articulation et un TCP', () => {
+test('le robot a 7 groupes d’articulation et un TCP', () => {
   const r = buildRobot();
-  assert.equal(r.joints.length, 6);
+  assert.equal(r.joints.length, 7);
   assert.ok(r.tcp.isObject3D);
   assert.ok(r.group.children.length > 0);
 });
 
 test('applyAngles applique la rotation sur le bon axe', () => {
   const r = buildRobot();
-  const angles = [10, 20, 30, 40, 50, 60];
+  const angles = [10, 20, 30, 40, 50, 60, 70];
   applyAngles(r.joints, angles);
   JOINTS.forEach((j, i) => {
     const expected = (angles[i] * Math.PI) / 180;
@@ -23,21 +23,21 @@ test('applyAngles applique la rotation sur le bon axe', () => {
 
 test('applyAngles borne les valeurs hors limites', () => {
   const r = buildRobot();
-  applyAngles(r.joints, [99999, -99999, 0, 0, 0, 0]);
+  applyAngles(r.joints, [99999, -99999, 0, 0, 0, 0, 0]);
   assert.ok(Math.abs(r.joints[0].rotation.z - (JOINTS[0].max * Math.PI) / 180) < 1e-9);
   assert.ok(Math.abs(r.joints[1].rotation.y - (JOINTS[1].min * Math.PI) / 180) < 1e-9);
 });
 
 test('le robot est perpendiculaire au sol : axe du bras selon Y (vertical)', () => {
   const r = buildRobot();
-  applyAngles(r.joints, [0, 0, 0, 0, 0, 0]);
+  applyAngles(r.joints, [0, 0, 0, 0, 0, 0, 0]);
   const up = tcpWorldPosition(r);
   const total = 0.36 + LINK_LENGTHS.reduce((s, l) => s + l, 0) + 0.34;
   assert.ok(Math.abs(up.y - total) < 1e-6, `TCP y=${up.y}, attendu ${total}`);
   assert.ok(Math.abs(up.x) < 1e-9 && Math.abs(up.z) < 1e-9, 'TCP sur l’axe vertical');
   assert.ok(up.y > 0, 'le bras se dresse au-dessus du sol (y > 0)');
 
-  applyAngles(r.joints, [0, 90, 0, 0, 0, 0]);
+  applyAngles(r.joints, [0, 90, 0, 0, 0, 0, 0]);
   const horiz = tcpWorldPosition(r);
   const reach = LINK_LENGTHS.slice(1).reduce((s, l) => s + l, 0) + 0.34;
   const d = Math.hypot(horiz.x, horiz.z);
@@ -47,9 +47,9 @@ test('le robot est perpendiculaire au sol : axe du bras selon Y (vertical)', () 
 
 test('rotation J1 déplace le TCP autour de l’axe vertical Y', () => {
   const r = buildRobot();
-  applyAngles(r.joints, [0, 45, -45, 0, 0, 0]);
+  applyAngles(r.joints, [0, 45, -45, 0, 0, 0, 0]);
   const p0 = tcpWorldPosition(r);
-  applyAngles(r.joints, [90, 45, -45, 0, 0, 0]);
+  applyAngles(r.joints, [90, 45, -45, 0, 0, 0, 0]);
   const p90 = tcpWorldPosition(r);
   assert.ok(Math.abs(p0.y - p90.y) < 1e-9, 'y inchangé');
   const r0 = Math.hypot(p0.x, p0.z);

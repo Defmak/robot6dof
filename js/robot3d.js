@@ -68,28 +68,36 @@ export function buildRobot() {
   const j5 = new THREE.Group();
   j5.position.z = L[3];
   j4.add(j5);
-  j5.add(jointSphere(0.1, matDark));
-  const link5 = zCylinder(0.055, L[4], matSteel);
+  j5.add(jointSphere(0.095, matDark));
+  const link5 = zCylinder(0.06, L[4], matSteel);
   link5.position.z = L[4] / 2;
   j5.add(link5);
 
   const j6 = new THREE.Group();
   j6.position.z = L[4];
   j5.add(j6);
-  j6.add(jointSphere(0.085, matDark));
+  j6.add(jointSphere(0.1, matDark));
+  const link6 = zCylinder(0.055, L[5], matSteel);
+  link6.position.z = L[5] / 2;
+  j6.add(link6);
+
+  const j7 = new THREE.Group();
+  j7.position.z = L[5];
+  j6.add(j7);
+  j7.add(jointSphere(0.085, matDark));
 
   const outil = zCylinder(0.04, TOOL_LENGTH, matDark);
   outil.position.z = TOOL_LENGTH / 2;
-  j6.add(outil);
+  j7.add(outil);
   const doigtG = mesh(new THREE.BoxGeometry(0.05, 0.09, 0.16), matSteel, 0.055, 0, TOOL_LENGTH + 0.06);
   const doigtD = mesh(new THREE.BoxGeometry(0.05, 0.09, 0.16), matSteel, -0.055, 0, TOOL_LENGTH + 0.06);
-  j6.add(doigtG, doigtD);
+  j7.add(doigtG, doigtD);
 
   const tcp = new THREE.Object3D();
   tcp.position.z = TOOL_LENGTH + 0.14;
-  j6.add(tcp);
+  j7.add(tcp);
 
-  const joints = [j1, j2, j3, j4, j5, j6];
+  const joints = [j1, j2, j3, j4, j5, j6, j7];
   return { group: robot, joints, tcp, gripper: { left: doigtG, right: doigtD } };
 }
 

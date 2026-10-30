@@ -1,6 +1,6 @@
-# Bras robot industriel 6 DDL
+# Bras robot industriel 7 DDL
 
-Application web 3D (Three.js) représentant un bras robot industriel à 6 degrés de liberté.
+Application web 3D (Three.js) représentant un bras robot industriel à 7 degrés de liberté (J1–J7).
 ![Illustration](./illustration_robot.png)
 
 ## Lancer l'application
@@ -16,7 +16,7 @@ Ouvrir ensuite http://localhost:8080 dans un navigateur.
 ## Fonctionnalités
 
 - **Vue 3D manipulable** : orbite (glisser), zoom (molette), panoramique (clic droit) via OrbitControls.
-- **6 curseurs** : un par degré de liberté, avec limites d'angle réalistes et valeur affichée en degrés.
+- **7 curseurs** (J1–J7) : un par degré de liberté, avec limites d'angle réalistes et valeur affichée en degrés.
 - **Mode démo** : animation cyclique du robot entre plusieurs poses (bouton « ▶ Mode démo »), avec tracé de la trajectoire du TCP (outil). En mode démo, la pince saisit/lâche automatiquement les objets proches.
 - **Pince ouvrable** : bouton « 🤏 Fermer la pince / ✋ Ouvrir la pince » **et curseur « ✋ Main · ouverture de la pince » (0–100 %)** placé entre le coude (J3) et les poignets ; la pince attrape la poignée d'un objet proche du TCP quand elle se ferme et le transporte, puis le lâche à l'ouverture.
 - **6 objets à poignée** posés au sol autour du robot ; la poignée ciblée est surlignée en cyan.
