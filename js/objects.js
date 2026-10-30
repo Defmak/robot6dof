@@ -62,3 +62,23 @@ export function setHighlight(targets, active) {
     t.handleMat.emissive.setHex(t === active ? 0x00e5ff : 0x000000);
   }
 }
+
+export const GRAVITY = 9.81;
+export const FALL_SPEEDUP = 3;
+
+export function releaseTarget(t) {
+  t.held = false;
+  t.falling = true;
+  t.vy = 0;
+}
+
+export function stepFall(t, dt) {
+  if (!t.falling || t.held) return;
+  t.vy += GRAVITY * FALL_SPEEDUP * dt;
+  t.group.position.y -= t.vy * dt;
+  if (t.group.position.y <= 0) {
+    t.group.position.y = 0;
+    t.falling = false;
+    t.vy = 0;
+  }
+}

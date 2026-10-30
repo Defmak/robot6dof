@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { JOINTS, clampAll, demoPoseAt, demoCycleDuration } from './kinematics.js';
 import { buildRobot, applyAngles, tcpWorldPosition, setGripper } from './robot3d.js';
-import { buildTargets, findGrabbable, handleWorldPosition, setHighlight } from './objects.js';
+import { buildTargets, findGrabbable, setHighlight, releaseTarget, stepFall } from './objects.js';
 
 const canvasContainer = document.getElementById('scene');
 const slidersEl = document.getElementById('sliders');
@@ -169,9 +169,13 @@ resize();
 
 const clock = new THREE.Clock();
 
+let lastT = 0;
+
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
+  const dt = Math.min(0.05, t - lastT || 0.016);
+  lastT = t;
 
   if (state.demo) {
     state.angles = clampAll(demoPoseAt(t - state.demoStart));
@@ -192,11 +196,15 @@ function animate() {
   const held = targets.find((t) => t.held);
   if (state.gripAmount < 0.5 && !held) {
     const g = findGrabbable(tcp, targets);
-    if (g) g.held = true;
+    if (g) {
+      g.held = true;
+      g.falling = false;
+    }
   }
-  if (state.gripAmount > 0.5 && held) held.held = false;
-  if (held) {
-    held.group.position.copy(tcp).sub(held.handle.position);
+  if (state.gripAmount > 0.5 && held) releaseTarget(held);
+  for (const t of targets) {
+    stepFall(t, dt);
+    if (t.held) t.group.position.copy(tcp).sub(t.handle.position);
   }
   setHighlight(targets, state.gripAmount < 0.5 ? null : findGrabbable(tcp, targets));
 
