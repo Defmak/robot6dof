@@ -223,16 +223,13 @@ function stopDemo() {
 
 demoBtn.addEventListener('click', () => {
   if (state.demo) return stopDemo();
+  state.demo = true;
+  demoBtn.textContent = '⏸ Arrêter la démo';
+  demoBtn.classList.add('active');
   state.playing = null;
   macroBtns.forEach((b) => b.classList.remove('playing'));
   stopRecording();
-});
-
-demoBtn.addEventListener('click', () => {
-  state.demo = !state.demo;
-  demoBtn.textContent = state.demo ? '⏸ Arrêter la démo' : '▶ Mode démo';
-  demoBtn.classList.toggle('active', state.demo);
-  if (state.demo) state.demoStart = clock.elapsedTime;
+  state.demoStart = clock.elapsedTime;
 });
 
 resetBtn.addEventListener('click', () => {
