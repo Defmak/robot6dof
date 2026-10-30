@@ -1,5 +1,5 @@
 export const JOINTS = [
-  { id: 'J1', name: 'Base — rotation verticale', axis: 'z', min: -170, max: 170, home: 0 },
+  { id: 'J1', name: 'Base conique — rotation sur le sol', axis: 'z', min: -170, max: 170, home: 0 },
   { id: 'J2', name: 'Épaule', axis: 'y', min: -65, max: 120, home: 30 },
   { id: 'J3', name: 'Coude', axis: 'y', min: -140, max: 140, home: -60 },
   { id: 'J4', name: 'Poignet — rotation (roll)', axis: 'z', min: -180, max: 180, home: 0 },

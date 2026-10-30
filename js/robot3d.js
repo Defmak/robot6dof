@@ -28,14 +28,13 @@ function jointSphere(r, material = matSteel) {
 
 export function buildRobot() {
   const robot = new THREE.Group();
-
-  const socle = mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.18, 40), matDark, 0, 0, 0.09);
-  const couronne = mesh(new THREE.CylinderGeometry(0.24, 0.3, 0.24, 40), matSteel, 0, 0, 0.28);
-  robot.add(socle, couronne);
+  robot.rotation.x = -Math.PI / 2;
 
   const j1 = new THREE.Group();
   j1.position.z = 0.36;
   robot.add(j1);
+  const baseCone = mesh(new THREE.CylinderGeometry(0.24, 0.52, 0.36, 40), matDark, 0, 0, -0.18);
+  j1.add(baseCone);
   j1.add(jointSphere(0.21));
   const link1 = zCylinder(0.15, L[0], matBody);
   link1.position.z = L[0] / 2;

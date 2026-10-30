@@ -28,34 +28,35 @@ test('applyAngles borne les valeurs hors limites', () => {
   assert.ok(Math.abs(r.joints[1].rotation.y - (JOINTS[1].min * Math.PI) / 180) < 1e-9);
 });
 
-test('position TCP cohérente : bras replié proche de l’axe Z, bras tendu plus haut', () => {
+test('le robot est perpendiculaire au sol : axe du bras selon Y (vertical)', () => {
   const r = buildRobot();
   applyAngles(r.joints, [0, 0, 0, 0, 0, 0]);
   const up = tcpWorldPosition(r);
   const total = 0.36 + LINK_LENGTHS.reduce((s, l) => s + l, 0) + 0.34;
-  assert.ok(Math.abs(up.z - total) < 1e-6, `TCP z=${up.z}, attendu ${total}`);
-  assert.ok(Math.abs(up.x) < 1e-9 && Math.abs(up.y) < 1e-9);
+  assert.ok(Math.abs(up.y - total) < 1e-6, `TCP y=${up.y}, attendu ${total}`);
+  assert.ok(Math.abs(up.x) < 1e-9 && Math.abs(up.z) < 1e-9, 'TCP sur l’axe vertical');
+  assert.ok(up.y > 0, 'le bras se dresse au-dessus du sol (y > 0)');
 
   applyAngles(r.joints, [0, 90, 0, 0, 0, 0]);
   const horiz = tcpWorldPosition(r);
   const reach = LINK_LENGTHS.slice(1).reduce((s, l) => s + l, 0) + 0.34;
-  const d = Math.hypot(horiz.x, horiz.y);
+  const d = Math.hypot(horiz.x, horiz.z);
   assert.ok(Math.abs(d - reach) < 1e-6, `portée horizontale ${d} vs ${reach}`);
-  assert.ok(Math.abs(horiz.z - LINK_LENGTHS[0] - 0.36) < 1e-6);
+  assert.ok(Math.abs(horiz.y - LINK_LENGTHS[0] - 0.36) < 1e-6, `hauteur ${horiz.y}`);
 });
 
-test('rotation J1 déplace le TCP autour de l’axe Z', () => {
+test('rotation J1 déplace le TCP autour de l’axe vertical Y', () => {
   const r = buildRobot();
   applyAngles(r.joints, [0, 45, -45, 0, 0, 0]);
   const p0 = tcpWorldPosition(r);
   applyAngles(r.joints, [90, 45, -45, 0, 0, 0]);
   const p90 = tcpWorldPosition(r);
-  assert.ok(Math.abs(p0.z - p90.z) < 1e-9, 'z inchangé');
-  const r0 = Math.hypot(p0.x, p0.y);
-  const r90 = Math.hypot(p90.x, p90.y);
+  assert.ok(Math.abs(p0.y - p90.y) < 1e-9, 'y inchangé');
+  const r0 = Math.hypot(p0.x, p0.z);
+  const r90 = Math.hypot(p90.x, p90.z);
   assert.ok(Math.abs(r0 - r90) < 1e-9, 'même rayon');
   assert.ok(r0 > 0.05, 'TCP hors de l’axe');
-  const angle = Math.atan2(p90.y, p90.x) - Math.atan2(p0.y, p0.x);
+  const angle = Math.atan2(p90.z, p90.x) - Math.atan2(p0.z, p0.x);
   const norm = ((angle + Math.PI) % (2 * Math.PI)) - Math.PI;
   assert.ok(Math.abs(Math.abs(norm) - Math.PI / 2) < 1e-6, `rotation de 90° (obtenu ${norm})`);
 });
@@ -70,6 +71,26 @@ test('la position du TCP reste dans l’enveloppe atteignable', () => {
     const d = p.length();
     assert.ok(d <= reachMax + 1e-6, `hors enveloppe: ${d} > ${reachMax}`);
   }
+});
+
+test('la base est un cône solidaire de J1 et posée sur le sol', () => {
+  const r = buildRobot();
+  const cone = r.joints[0].children.find((c) => c.isMesh && c.geometry.type === 'CylinderGeometry');
+  assert.ok(cone, 'cône présent dans le groupe J1');
+  assert.ok(Math.abs(cone.geometry.parameters.radiusTop - 0.24) < 1e-9);
+  assert.ok(Math.abs(cone.geometry.parameters.radiusBottom - 0.52) < 1e-9);
+  assert.ok(cone.geometry.parameters.radiusBottom > cone.geometry.parameters.radiusTop, 'base évasée vers le sol');
+  r.group.updateMatrixWorld(true);
+  const p = new THREE.Vector3();
+  cone.getWorldPosition(p);
+  assert.ok(Math.abs(p.y - 0.18) < 1e-9, `centre du cône à y=${p.y}`);
+  const bottomY = p.y - cone.geometry.parameters.height / 2;
+  assert.ok(Math.abs(bottomY) < 1e-9, `base du cône au sol (y=${bottomY})`);
+  const topY = p.y + cone.geometry.parameters.height / 2;
+  assert.ok(Math.abs(topY - 0.36) < 1e-9, `sommet du cône au niveau de J1 (y=${topY})`);
+
+  applyAngles(r.joints, [90, 0, 0, 0, 0, 0]);
+  assert.ok(Math.abs(r.joints[0].rotation.z - Math.PI / 2) < 1e-9, 'le cône tourne avec J1');
 });
 
 test('les maillons sont des meshes 3D', () => {
