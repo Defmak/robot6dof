@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bras robot industriel 6 DDL</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./node_modules/three/build/three.module.js",
+        "three/addons/": "./node_modules/three/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <h1>🦾 Bras robot industriel — 6 DDL</h1>
+      <div id="actions">
+        <button id="demo-btn">▶ Mode démo</button>
+        <button id="reset-btn">⟲ Position initiale</button>
+      </div>
+    </header>
+    <main>
+      <section id="scene" aria-label="Vue 3D du robot"></section>
+      <aside id="panel">
+        <h2>Articulations</h2>
+        <div id="sliders"></div>
+        <div id="tcp-readout" class="tcp">TCP : —</div>
+        <p class="hint">
+          Glissez dans la vue 3D pour orbiter · Molette pour zoomer · Clic droit pour déplacer.
+        </p>
+      </aside>
+    </main>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

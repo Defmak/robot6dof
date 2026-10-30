@@ -1,0 +1,97 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: #10141b;
+  color: #e8ecf3;
+  overflow: hidden;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: #171c26;
+  border-bottom: 1px solid #262d3b;
+}
+
+#topbar h1 { font-size: 1.05rem; margin: 0; font-weight: 600; }
+
+#actions { display: flex; gap: 10px; }
+
+button {
+  background: #232a38;
+  color: #e8ecf3;
+  border: 1px solid #39435a;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+button:hover { background: #2d3648; }
+button.active {
+  background: #0e5a68;
+  border-color: #00e5ff;
+  color: #d8fbff;
+}
+
+main { display: flex; flex: 1; min-height: 0; }
+
+#scene { flex: 1; position: relative; min-width: 0; }
+#scene canvas { display: block; width: 100%; height: 100%; }
+
+#panel {
+  width: 320px;
+  min-width: 320px;
+  background: #151a24;
+  border-left: 1px solid #262d3b;
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#panel h2 { font-size: 0.95rem; margin: 0 0 4px; color: #9fb2cc; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.joint-row { margin-bottom: 12px; }
+
+.joint-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+.joint-name { color: #c6d2e4; }
+.joint-val { color: #00e5ff; font-variant-numeric: tabular-nums; }
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #ff7a1a;
+  cursor: pointer;
+}
+
+.tcp {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #0d2b31;
+  border: 1px solid #0e5a68;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #7ef3ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint { font-size: 0.75rem; color: #6d7a90; line-height: 1.4; margin: 0; }
+
+@media (max-width: 760px) {
+  main { flex-direction: column; }
+  #panel { width: 100%; min-width: 0; border-left: none; border-top: 1px solid #262d3b; max-height: 45%; }
+  #scene { min-height: 50%; }
+}

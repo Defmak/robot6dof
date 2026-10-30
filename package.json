@@ -1,0 +1,16 @@
+{
+  "name": "bras-robot-6ddl",
+  "version": "1.0.0",
+  "description": "Bras robot industriel 6 DDL en 3D (Three.js)",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "type": "module"
+}
