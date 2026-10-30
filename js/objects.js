@@ -6,6 +6,9 @@ const TARGET_DEFS = [
   { color: 0x4fc3f7, pos: [0.9, 0, 0.45] },
   { color: 0xaed581, pos: [-0.85, 0, 0.55] },
   { color: 0xffb74d, pos: [0.25, 0, -0.95] },
+  { color: 0xba68c8, pos: [-0.4, 0, -0.85] },
+  { color: 0xfff176, pos: [1.05, 0, -0.5] },
+  { color: 0xef5350, pos: [-1.1, 0, -0.15] },
 ];
 
 export function buildTargets(scene) {

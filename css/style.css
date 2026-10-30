@@ -15,10 +15,22 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
   padding: 10px 18px;
   background: #171c26;
   border-bottom: 1px solid #262d3b;
 }
+
+#macro-bar { display: flex; align-items: center; gap: 8px; }
+.macro-label { font-size: 0.8rem; color: #9fb2cc; }
+#macro-btns { display: flex; gap: 6px; }
+
+.macro-btn { padding: 6px 10px; font-size: 0.8rem; min-width: 44px; }
+.macro-btn.armed { background: #0e5a68; border-color: #00e5ff; color: #d8fbff; }
+.macro-btn.playing { background: #6d4a00; border-color: #ffb300; color: #fff3d6; }
+
+button.recording { background: #8a1f1f; border-color: #ff5252; color: #ffe1e1; }
 
 #topbar h1 { font-size: 1.05rem; margin: 0; font-weight: 600; }
 

@@ -20,10 +20,10 @@ test('la pince a deux doigts et setGripper les écarte/referme', () => {
   assert.ok(Math.abs(r.gripper.left.position.x - GRIPPER_REST_X) < 1e-9, 'borné à 0');
 });
 
-test('trois objets avec poignée sont placés au sol', () => {
+test('six objets avec poignée sont placés au sol', () => {
   const scene = new THREE.Scene();
   const targets = buildTargets(scene);
-  assert.equal(targets.length, 3);
+  assert.equal(targets.length, 6);
   for (const t of targets) {
     assert.ok(Math.abs(t.group.position.y) < 1e-9, 'objet posé au sol');
     const hp = handleWorldPosition(t);

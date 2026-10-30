@@ -3,6 +3,15 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { JOINTS, clampAll, demoPoseAt, demoCycleDuration } from './kinematics.js';
 import { buildRobot, applyAngles, tcpWorldPosition, setGripper, tryAngles } from './robot3d.js';
 import { buildTargets, findGrabbable, setHighlight, releaseTarget, stepFall } from './objects.js';
+import {
+  createRecorder,
+  recorderStart,
+  recorderSample,
+  recorderStop,
+  macroPoseAt,
+  macroDuration,
+  MACRO_SLOTS,
+} from './recorder.js';
 
 const canvasContainer = document.getElementById('scene');
 const slidersEl = document.getElementById('sliders');
@@ -10,6 +19,8 @@ const demoBtn = document.getElementById('demo-btn');
 const resetBtn = document.getElementById('reset-btn');
 const gripBtn = document.getElementById('grip-btn');
 const groundLock = document.getElementById('ground-lock');
+const recBtn = document.getElementById('rec-btn');
+const macroBtnsEl = document.getElementById('macro-btns');
 const tcpEl = document.getElementById('tcp-readout');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -97,7 +108,62 @@ const state = {
   demoStart: 0,
   gripOpen: true,
   gripAmount: 1,
+  recorder: createRecorder(),
+  pendingMacro: null,
+  macros: Array(MACRO_SLOTS).fill(null),
+  playing: null,
+  playStart: 0,
 };
+
+const macroBtns = [];
+for (let i = 0; i < MACRO_SLOTS; i++) {
+  const b = document.createElement('button');
+  b.className = 'macro-btn';
+  b.textContent = `M${i + 1}`;
+  b.title = 'Clic : enregistrer la macro en attente / rejouer la macro';
+  b.addEventListener('click', () => onMacroSlot(i));
+  macroBtnsEl.appendChild(b);
+  macroBtns.push(b);
+}
+
+function onMacroSlot(i) {
+  if (state.pendingMacro) {
+    state.macros[i] = state.pendingMacro;
+    state.pendingMacro = null;
+    macroBtns[i].textContent = `M${i + 1} ✔`;
+    macroBtns[i].classList.add('armed');
+    recBtn.textContent = '⏺ Start';
+    recBtn.classList.remove('recording');
+    return;
+  }
+  const m = state.macros[i];
+  if (!m) return;
+  stopDemo();
+  stopRecording();
+  state.playing = i;
+  state.playStart = clock.elapsedTime;
+  macroBtns.forEach((b, k) => b.classList.toggle('playing', k === i));
+}
+
+function stopRecording() {
+  if (!state.recorder.recording) return;
+  state.pendingMacro = recorderStop(state.recorder, clock.elapsedTime, state.angles);
+  recBtn.textContent = '⏺ Start';
+  recBtn.classList.remove('recording');
+}
+
+recBtn.addEventListener('click', () => {
+  if (state.recorder.recording) {
+    stopRecording();
+    return;
+  }
+  stopDemo();
+  state.playing = null;
+  macroBtns.forEach((b) => b.classList.remove('playing'));
+  recorderStart(state.recorder, clock.elapsedTime, state.angles);
+  recBtn.textContent = '⏹ Stop';
+  recBtn.classList.add('recording');
+});
 
 function setGripOpen(open) {
   state.gripOpen = open;
@@ -125,6 +191,8 @@ JOINTS.forEach((j, i) => {
   const slider = row.querySelector(`#slider-${j.id}`);
   slider.addEventListener('input', () => {
     stopDemo();
+    state.playing = null;
+    macroBtns.forEach((b) => b.classList.remove('playing'));
     const next = [...state.angles];
     next[i] = parseFloat(slider.value);
     if (groundLock.checked) {
@@ -152,6 +220,13 @@ function stopDemo() {
   demoBtn.textContent = '▶ Mode démo';
   demoBtn.classList.remove('active');
 }
+
+demoBtn.addEventListener('click', () => {
+  if (state.demo) return stopDemo();
+  state.playing = null;
+  macroBtns.forEach((b) => b.classList.remove('playing'));
+  stopRecording();
+});
 
 demoBtn.addEventListener('click', () => {
   state.demo = !state.demo;
@@ -190,6 +265,19 @@ function animate() {
     state.angles = clampAll(demoPoseAt(t - state.demoStart));
     syncSliders();
   }
+  if (state.playing !== null && state.macros[state.playing]) {
+    const m = state.macros[state.playing];
+    const dt2 = t - state.playStart;
+    if (dt2 > macroDuration(m)) {
+      state.playing = null;
+      macroBtns.forEach((b) => b.classList.remove('playing'));
+      state.angles = [...m[m.length - 1].angles];
+    } else {
+      state.angles = clampAll(macroPoseAt(m, dt2));
+    }
+    syncSliders();
+  }
+  if (state.recorder.recording) recorderSample(state.recorder, t, state.angles);
   if (groundLock.checked) {
     tryAngles(robot, state.angles);
   } else {
