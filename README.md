@@ -1,6 +1,7 @@
 # Bras robot industriel 6 DDL
 
 Application web 3D (Three.js) représentant un bras robot industriel à 6 degrés de liberté.
+![Illustration](./illustration_robot.png)
 
 ## Lancer l'application
 
